@@ -1,6 +1,6 @@
 # Grok skills
 
-14 production-tested skills for the Grok skills folder, from the author's own content and marketing pipelines. Each one is a `SKILL.md` your Grok assistant reads, with a plain-English intro, install lines for macOS, Linux and Windows, a worked example, the exact commands and the known pitfalls.
+15 production-tested skills for the Grok skills folder, from the author's own content and marketing pipelines. Each one is a `SKILL.md` your Grok assistant reads, with a plain-English intro, install lines for macOS, Linux and Windows, a worked example, the exact commands and the known pitfalls.
 
 ## Skills
 
@@ -13,11 +13,12 @@
 - [`skeptical-ffmpeg-concat-traps`](skills/skeptical-ffmpeg-concat-traps/SKILL.md): The silent ffmpeg concat bugs: overlays that vanish after a segment boundary, SAR mismatches, dropped audio and one-frame stills, with fixes and checks.
 - [`skeptical-gtm-form-lead-tracking`](skills/skeptical-gtm-form-lead-tracking/SKILL.md): Fix GTM form tags that fire on every Next click: fire on the confirmation event instead, wire enhanced conversions, and audit a published container with curl.
 - [`skeptical-ga4-admin-api-automation`](skills/skeptical-ga4-admin-api-automation/SKILL.md): Script GA4 custom channel groupings, audiences, annotations and enhanced measurement with the Admin API, including the verified quirks (v1alpha, eachScope* fields, inListFilter UI bug, 2-grouping limit).
-- [`skeptical-post-launch-site-audit`](skills/skeptical-post-launch-site-audit/SKILL.md): A ten-step terminal audit for a newly launched website: crawl, redirects, robots and sitemaps, tracking, staging leaks, schema, spellcheck, with a severity-bucketed report.
+- [`skeptical-post-launch-site-audit`](skills/skeptical-post-launch-site-audit/SKILL.md): A ten-step terminal audit for a newly launched website: crawl, redirects, robots and sitemaps, tracking, staging leaks, schema, spellcheck, with a severity-bucketed report. Refined across 15+ production site launches.
 - [`skeptical-content-trend-triangulation`](skills/skeptical-content-trend-triangulation/SKILL.md): A daily topic-selection procedure: triangulate Google Trends RSS, Techmeme and trade press, never trust one AI search tool's denial, and log runner-ups.
 - [`skeptical-source-footage-audit`](skills/skeptical-source-footage-audit/SKILL.md): A QA procedure for source footage: contact sheets, full-res fine pass, brightness check, privacy and policy audit, still images, and an exclusion log.
 - [`skeptical-x-original-media-fetch`](skills/skeptical-x-original-media-fetch/SKILL.md): Fetch original-resolution photos and videos from X posts with no API: fxtwitter JSON for media URLs, then `?name=orig` on pbs.twimg.com.
 - [`skeptical-osm-map-cards`](skills/skeptical-osm-map-cards/SKILL.md): Location map cards for videos and posts from OpenStreetMap tiles in pure Python: zoom picking, tile mosaic math, and the PIL black-strip bounds guard.
+- [`skeptical-gbp-vendor-audit-review`](skills/skeptical-gbp-vendor-audit-review/SKILL.md): Review a vendor's Google Business Profile audit before approving changes: nine standing traps, an audit-the-auditor verification pass, and one copy-paste reply that answers everything.
 
 ## Install
 

@@ -30,11 +30,11 @@ Nothing to install for the workflow itself. It works on macOS, Linux and Windows
 
 ILLUSTRATIVE ONLY. This is one nightly pass, built from the pipeline steps and values below. All IDs are placeholders (`<VIDEO_ID>`, `<topic phrase>`, `<publish time>`), and no real channel, metric or result is shown.
 
-1. **FIND.** Query the YouTube Data API (`videos.list`, `forMine`, published within 48-72h) and diff against the state file map of already-optimized video IDs. If nothing is new, exit silently with no state write. Here, one new video is found: `<VIDEO_ID>`.
+1. **FIND.** Query the YouTube Data API (`search.list` with `forMine=true` and `type=video`, or `playlistItems.list` on your uploads playlist then `videos.list` by id, published within 48-72h) and diff against the state file map of already-optimized video IDs. If nothing is new, exit silently with no state write. Here, one new video is found: `<VIDEO_ID>`.
 2. **AUDIO VERIFY** (optional, alert-only). Compare the published audio with your source render. If it fails, make that the first line of the report, still apply metadata, flag the video once in state, and never delete or privatize it.
 3. **RETENTION and CTR REVIEW.** This runs at day 7, so a brand-new video is not reviewed yet. Nothing to do for `<VIDEO_ID>` on this pass.
-4. **BUILD.** Run keyword research on `<topic phrase>`. Check your credit balance first. If the research API is dry, fall back to title-derived tags. Keep at most 15 tags, each <=30 chars, filtered against the banned-topic list. Pick the category for the content domain. Add the standing defaults: recordingDate = `<publish time>` (ISO 8601 UTC), license = youtube, madeForKids = false, embeddable = true. Do not send location.
-5. **PUSH and VERIFY.** Make one `videos.update` call for `<VIDEO_ID>`. Read it back and confirm the tags and category landed. If the read-back looks stale, re-get after ~10 seconds instead of writing again. On HTTP 412 preconditionFailed, retry with 8/16/24s backoff. On 403 quotaExceeded, do not retry: park the video in `quota_pending` and report once. Mark the video optimized in state only after the verified write.
+4. **BUILD.** Run keyword research on `<topic phrase>`. Check your credit balance first. If the research API is dry, fall back to title-derived tags. Keep at most 15 tags, each <=30 chars, filtered against the banned-topic list. Pick the category for the content domain. Add the standing defaults: recordingDate = `<publish time>` (ISO 8601 UTC), license = youtube, madeForKids = false (sent as `status.selfDeclaredMadeForKids`), embeddable = true. Do not send location.
+5. **PUSH and VERIFY.** First read the current video with `videos.list`, so you can send back everything you are not changing (the `videos.update` docs say unspecified existing values are deleted). Make one `videos.update` call for `<VIDEO_ID>`, listing the parts you are writing, with `snippet.title` and `snippet.categoryId` included whenever you update the snippet. Read it back and confirm the tags and category landed. If the read-back looks stale, re-get after ~10 seconds instead of writing again. On HTTP 412 preconditionFailed, retry with 8/16/24s backoff. On 403 quotaExceeded, do not retry: park the video in `quota_pending` and report once. Mark the video optimized in state only after the verified write.
 6. **SPONSOR blocks.** None pending, so nothing to apply.
 7. **REPORT.** Short plain text, for example:
 
@@ -45,6 +45,8 @@ Failures: none.
 ```
 
 The video is now marked optimized in state, and it is never touched again. Its title and thumbnail are left alone: no packaging change is proposed before 72 hours.
+
+**API notes (added by Skeptical, verified against YouTube Data API docs on 2026-10-26):** `forMine` is a `search.list` filter (with `type=video`), not a `videos.list` filter, and `videos.update` removes existing values you leave out of the parts you list, so always read first and send back what you are not changing. The full notes, with field locations, quota costs and doc links, are at the end of this file.
 
 ---
 
@@ -61,7 +63,7 @@ Core doctrine: the optimizer OWNS tags, category, recording date, and standing d
 
 ## Pipeline (one pass per run)
 
-1. FIND newly published videos. Query your publishing tool's scheduled-posts API or the YouTube Data API (`videos.list`, `forMine`, published within 48-72h). Diff against a state file map of already-optimized video IDs. Nothing new = exit silently, no state write.
+1. FIND newly published videos. Query your publishing tool's scheduled-posts API or the YouTube Data API (`search.list` with `forMine=true` and `type=video`, or `playlistItems.list` on your uploads playlist then `videos.list` by id, published within 48-72h) **[Skeptical correction: the original text here read "videos.list, forMine". See the API notes at the end of this file.]**. Diff against a state file map of already-optimized video IDs. Nothing new = exit silently, no state write.
 2. AUDIO VERIFY (alert-only, optional but recommended for TTS/AI-voiced content). Compare the PUBLISHED YouTube audio against your source render: speaker-embedding similarity vs a calibrated voice bank, dropout scan, platform-vs-source diff. Platform ingest can mangle audio that the pre-publish gate passed. On FAIL: alert as the first line of the report, still apply metadata, flag the video once in state. Never auto-delete or auto-privatize; false positives happen and a human must listen.
 3. RETENTION & CTR REVIEW at day 7 (alert-only). Thresholds that work: average percentage viewed < 55% on 45-55s shorts = HOOK/PACING flag (healthy is 60-75%; the fix belongs to the NEXT video: rehook at 0:20-0:30, tighten the first 30s). CTR < 0.6x the window mean with >2,000 impressions = PACKAGING flag. Review each video once; track reviewed IDs in state.
 4. BUILD the metadata set. Tags: run keyword research on the video's topic phrase (VidIQ keyword_research or equivalent); check your credit balance first and fall back to title-derived tags when the research API is dry. Max 15 tags, each <=30 chars, filtered against your channel's banned-topic list. Category: pick per content domain and default it. Standing defaults on EVERY video: recordingDate = publish time (ISO 8601 UTC), license = youtube, madeForKids = false, embeddable = true. Do NOT send location (silently discarded by the API).
@@ -102,3 +104,34 @@ A 15-minute polling schedule for this workflow once consumed ~37% of an agent's 
 3. Clone an existing job prompt, swap channel ID, category default, and tag seed domains.
 4. Pin the agent model explicitly so a model swap cannot silently change behavior.
 5. First run: verify the read-back manually before trusting the state marks.
+
+
+## API notes (added by Skeptical, verified against YouTube Data API docs on 2026-10-26)
+
+These notes are not part of the original spec. They were checked against the official YouTube Data API reference pages listed here on 2026-10-26. Where the docs do not confirm something, it is left out. The spec rules above are unchanged, except for the one marked correction in Pipeline step 1.
+
+### Finding new videos (step 1)
+
+- `forMine` is a `search.list` filter, not a `videos.list` filter. The documented `videos.list` filters are `chart`, `id` and `myRating`. With `forMine=true`, `type` must also be `video`, and these cannot be set in the same request: `videoDefinition`, `videoDimension`, `videoDuration`, `videoEmbeddable`, `videoLicense`, `videoPaidProductPlacement`, `videoSyndicated`, `videoType`. The request must be authorized.
+- The `search.list` docs say that for `order=date`, results rely on the search index, so you may see indexing delays or incomplete result sets, and that to reliably retrieve a channel's most recent uploads you should use `playlistItems.list` on the channel's uploads playlist instead.
+- Uploads-playlist route: `channels.list` with `mine=true` and `part=contentDetails` returns `contentDetails.relatedPlaylists.uploads`. Pass that as `playlistId` to `playlistItems.list` (the docs' own sample reads each video's ID from `snippet.resourceId.videoId`). Then call `videos.list` with `id` for the details you need.
+- Quota costs as listed in the docs: `channels.list` 1 unit, `playlistItems.list` 1 unit, `videos.list` 1 unit, `videos.update` 50 units, `thumbnails.set` 50 units. `search.list` has its own bucket: a default of 100 calls per day, and each call costs 1 in that bucket. Other endpoints share a default of 10,000 units per day, daily quota resets at midnight Pacific Time, and every request, including an invalid one, costs at least 1. Each extra page of results is another call.
+
+### Writing metadata (steps 4 and 5)
+
+- `part` on `videos.update` lists the parts you are writing. The docs say the method overrides the existing values of all mutable properties in any part you list. If you list a part and leave a property out, its existing value is removed (the docs' own example is `status.privacyStatus`, which reverts to the default). So read the current video first with `videos.list`, change only what you mean to change, and send the rest back unchanged (read-modify-write).
+- If you update the `snippet` part, `snippet.title` and `snippet.categoryId` are required, along with the video `id`. To keep the title and description as the spec requires, send the existing `snippet.title` and `snippet.description` back, and any other snippet values you want to keep, such as existing `snippet.tags[]` and `snippet.defaultLanguage`. The docs say a property that has a value but is not specified in the update is deleted. The exceptions are `status.selfDeclaredMadeForKids` and `status.containsSyntheticMedia`, which only change when explicitly set.
+- Field locations: tags are `snippet.tags[]`; category is `snippet.categoryId`; the recording date is `recordingDetails.recordingDate` (ISO 8601, `YYYY-MM-DDThh:mm:ss.sssZ`); the license is `status.license` (`creativeCommon` or `youtube`); embeddable is `status.embeddable`.
+- "madeForKids": `status.madeForKids` reports the video's current made-for-kids status. The property you set in `videos.update` is `status.selfDeclaredMadeForKids`.
+- The docs also limit `snippet.tags[]` to 500 characters in total, counting the commas between tags, and counting quotation marks around any tag that contains a space. That is in addition to the spec's own limits (max 15 tags, each <=30 chars).
+- Location: the docs mark `recordingDetails.location` and its latitude, longitude and altitude as deprecated, and the list of properties you can set in `videos.update` does not include it. The docs do not say it is silently discarded. The spec's rule "Do NOT send location" is consistent with the deprecation.
+
+### Sources
+
+- https://developers.google.com/youtube/v3/docs/search/list
+- https://developers.google.com/youtube/v3/docs/channels/list
+- https://developers.google.com/youtube/v3/docs/playlistItems/list
+- https://developers.google.com/youtube/v3/docs/videos/list
+- https://developers.google.com/youtube/v3/docs/videos/update
+- https://developers.google.com/youtube/v3/docs/videos (resource representation)
+- https://developers.google.com/youtube/v3/determine_quota_cost

@@ -1,6 +1,6 @@
 # Grok skills
 
-15 production-tested skills for the Grok skills folder, from the author's own content and marketing pipelines. Each one is a `SKILL.md` your Grok assistant reads, with a plain-English intro, install lines for macOS, Linux and Windows, a worked example, the exact commands and the known pitfalls.
+16 production-tested skills for the Grok skills folder, from the author's own content and marketing pipelines. Each one is a `SKILL.md` your Grok assistant reads, with a plain-English intro, install lines for macOS, Linux and Windows, a worked example, the exact commands and the known pitfalls.
 
 ## Skills
 
@@ -19,6 +19,7 @@
 - [`skeptical-x-original-media-fetch`](skills/skeptical-x-original-media-fetch/SKILL.md): Fetch original-resolution photos and videos from X posts with no API: fxtwitter JSON for media URLs, then `?name=orig` on pbs.twimg.com.
 - [`skeptical-osm-map-cards`](skills/skeptical-osm-map-cards/SKILL.md): Location map cards for videos and posts from OpenStreetMap tiles in pure Python: zoom picking, tile mosaic math, and the PIL black-strip bounds guard.
 - [`skeptical-gbp-vendor-audit-review`](skills/skeptical-gbp-vendor-audit-review/SKILL.md): Review a vendor's Google Business Profile audit before approving changes: nine standing traps, an audit-the-auditor verification pass, and one copy-paste reply that answers everything.
+- [`skeptical-youtube-post-publish-optimizer`](skills/skeptical-youtube-post-publish-optimizer/SKILL.md): A nightly workflow that applies tags, category, recording date and standing defaults to just-published YouTube videos, verifies every write by read-back, runs alert-only QA gates, and enforces a 72 hour packaging-change protocol.
 
 ## Install
 

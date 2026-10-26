@@ -8,7 +8,7 @@ when-to-use: "A new or rebuilt website just went live and you need findings to h
 
 ## What this does (plain English)
 
-A new website can look fine in a browser and still have serious problems underneath: the bare domain redirecting to a dev server, the same pageview counted twice, staging links left in the HTML, or broken schema. This skill gives your AI assistant a ten-step audit it runs entirely from the terminal with `curl` and Python: enumerate every URL, parse each saved page, test every redirect variant, check robots and sitemaps, verify the tracking stack, hunt staging leaks, QA the schema, and spellcheck. It ends with a severity-bucketed report, with each finding assigned to the responsible team (web dev or SEO), exact evidence, and a verified-working list.
+A new website can look fine in a browser and still have serious problems underneath: the bare domain redirecting to a dev server, the same pageview counted twice, staging links left in the HTML, or broken schema. This skill gives your AI assistant a ten-step audit it runs entirely from the terminal with `curl` and Python: enumerate every URL, parse each saved page, test every redirect variant, check robots and sitemaps, verify the tracking stack, hunt staging leaks, QA the schema, and spellcheck. It ends with a severity-bucketed report, with each finding assigned to the responsible team (web dev or SEO), exact evidence, and a verified-working list. Refined across 15+ production site launches.
 
 ## Responsible use
 

@@ -1,6 +1,6 @@
 # skeptical-post-launch-site-audit (Grok skill)
 
-A ten-step terminal audit for a newly launched website: crawl, redirects, robots and sitemaps, tracking, staging leaks, schema, spellcheck, with a severity-bucketed report.
+A ten-step terminal audit for a newly launched website: crawl, redirects, robots and sitemaps, tracking, staging leaks, schema, spellcheck, with a severity-bucketed report. Refined across 15+ production site launches.
 
 ## Install
 

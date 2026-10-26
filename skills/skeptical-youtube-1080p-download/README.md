@@ -1,0 +1,47 @@
+# skeptical-youtube-1080p-download (Grok skill)
+
+Download YouTube videos you have the rights to at full 1080p (up to 1080p60) from the terminal with yt-dlp and ffmpeg. The main recipe needs no account and no cookies: it uses the `web_embedded` player client.
+
+## Install
+
+This is a drop-in skill folder. Copy it into a skills directory.
+
+User scope (all your projects), macOS or Linux:
+
+    mkdir -p ~/.grok/skills
+    cp -r skeptical-youtube-1080p-download ~/.grok/skills/
+
+User scope, Windows PowerShell (assumes Grok reads skills from `$HOME\.grok\skills`):
+
+    New-Item -ItemType Directory -Force "$HOME\.grok\skills"
+    Copy-Item -Recurse skeptical-youtube-1080p-download "$HOME\.grok\skills\"
+
+Project scope (shared via git):
+
+    mkdir -p .grok/skills
+    cp -r skeptical-youtube-1080p-download .grok/skills/
+
+If you downloaded the zip, unzip it first so you have the `skeptical-youtube-1080p-download` folder.
+
+## Requirements
+
+- `yt-dlp` and `ffmpeg` (includes `ffprobe`) on your PATH
+- macOS: `brew install yt-dlp ffmpeg`
+- Linux: `pipx install yt-dlp` and `sudo apt install ffmpeg` (or `sudo dnf install ffmpeg`)
+- Windows: `winget install yt-dlp.yt-dlp` and `winget install Gyan.FFmpeg`, then open a new terminal (Scoop and Chocolatey also work)
+
+## Use
+
+Ask Grok things like:
+
+> download this YouTube video in 1080p: <url>
+
+SKILL.md has a plain-English intro, a worked example, the exact commands and the known pitfalls.
+
+## Responsible use
+
+Only download content you own or have the rights to use (your own videos, licensed use, fair use where you live). Respect YouTube's Terms of Service and copyright law. This skill does not get past age restrictions, members-only content or login walls.
+
+## License
+
+MIT, see LICENSE.
